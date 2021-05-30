@@ -2,17 +2,7 @@
 gatedmlp
 ========
 
-
-Add a short description here!
-
-
-Description
-===========
-
-A longer description of your project goes here...
-
-
-.. _pyscaffold-notes:
+Reproducibility Study of "Pay Attention to MLPs"
 
 Note
 ====
