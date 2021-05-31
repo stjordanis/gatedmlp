@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 class SpatialGatingUnit(tf.keras.layers.Layer):
-    def __init__(self, seq_len):
+    def __init__(self, seq_len: int):
         super(SpatialGatingUnit, self).__init__()
         self.seq_len = seq_len
 

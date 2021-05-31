@@ -2,7 +2,7 @@ import torch.nn as nn
 
 
 class SpatialGatingUnit(nn.Module):
-    def __init__(self, d_ffn, seq_len):
+    def __init__(self, d_ffn: int, seq_len: int):
         super().__init__()
 
         # Input Size = (*, d_ffn // 2)

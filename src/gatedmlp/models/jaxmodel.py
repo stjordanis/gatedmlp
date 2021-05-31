@@ -1,13 +1,13 @@
-import jax.numpy as jnp
 import flax.linen as nn
+import jax.numpy as jnp
 
 
 class SpatialGatingUnit(nn.Module):
-    def __init__(self, seq_len, **kwargs):
-        super().__init__()
+    seq_len: int
 
+    def setup(self):
         self.norm = nn.LayerNorm(name="norm")
-        self.proj = nn.Dense(features=seq_len, name="proj")
+        self.proj = nn.Dense(features=self.seq_len, name="proj")
 
     @nn.compact
     def __call__(self, x):
