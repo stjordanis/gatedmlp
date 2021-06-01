@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow_addons as tfa
 
 
 class SpatialGatingUnit(tf.keras.layers.Layer):
@@ -42,7 +43,7 @@ class gMLPBlock(tf.keras.layers.Layer):
         self.proj_1 = tf.keras.layers.Dense(
             input_shape=(self.d_model,), units=self.d_ffn
         )
-        self.activation = tf.nn.gelu()
+        self.activation = tfa.layers.GELU()
         self.spatial_gating_unit = SpatialGatingUnit(self.seq_len)
         self.proj_2 = tf.keras.layers.Dense(
             input_shape=(self.d_model // 2,), units=self.d_model

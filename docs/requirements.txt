@@ -5,6 +5,7 @@ sphinx>=3.2.1
 # sphinx_rtd_theme
 torch>=1.8.1
 tensorflow>=2.4.0
+tensorflow-addons
 jax
 jaxlib
 flax

@@ -38,8 +38,9 @@ class gMLPBlock(nn.Module):
         # self.m = torch.distributions.bernoulli.Bernoulli(torch.Tensor([self.prob]))
 
     def forward(self, x):
+        """
         if self.training and torch.equal(self.m.sample(), torch.zeros(1)):
-            return x
+            return x"""
         shorcut = x.clone()
         x = self.norm(x)
         x = self.proj_1(x)
