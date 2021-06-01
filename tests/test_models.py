@@ -12,10 +12,11 @@ def test_torch_instance():
     """
     Instance checks for PyTorch Models and Modules
     """
-    temp = torch.randn([100, 15])
-    unit = torchmodel.SpatialGatingUnit(d_ffn=30, seq_len=100)
+    unit = torchmodel.SpatialGatingUnit(dim=30, dim_seq=100)
+    causal_unit = torchmodel.SpatialGatingUnit(dim=30, dim_seq=100, causal=True)
     block = torchmodel.gMLPBlock(d_model=500, d_ffn=30, seq_len=100)
     assert isinstance(unit, torch.nn.Module)
+    assert isinstance(causal_unit, torch.nn.Module)
     assert isinstance(block, torch.nn.Module)
 
 
@@ -42,7 +43,7 @@ def test_torch_pass():
     Pass checks for PyTorch Models and Modules
     """
     temp = torch.randn([100, 100, 30])
-    unit = torchmodel.SpatialGatingUnit(d_ffn=30, seq_len=100)
+    unit = torchmodel.SpatialGatingUnit(dim=30, dim_seq=100)
     block = torchmodel.gMLPBlock(d_model=30, d_ffn=30, seq_len=100)
     out = unit(temp)
     assert out is not None

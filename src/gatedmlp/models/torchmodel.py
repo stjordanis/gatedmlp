@@ -1,22 +1,49 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class SpatialGatingUnit(nn.Module):
-    def __init__(self, d_ffn: int, seq_len: int):
+    def __init__(
+        self,
+        dim: int,
+        dim_seq: int,
+        causal: bool = False,
+        act=nn.Identity(),
+        init_eps=1e-3,
+    ):
         super().__init__()
+        dim_out = dim // 2
+        self.causal = causal
 
-        # Input Size = (*, d_ffn // 2)
-        self.norm = nn.LayerNorm(d_ffn // 2)
-        self.proj = nn.Linear(seq_len, seq_len)
+        self.norm = nn.LayerNorm(dim_out)
+        self.proj = nn.Conv1d(dim_seq, dim_seq, 1)
 
-    def forward(self, x):
-        u, v = x.chunk(2, dim=-1)
-        v = self.norm(v)
-        v = v.permute(0, 2, 1)
-        v = self.proj(v)
-        v = v.permute(0, 2, 1)
-        return u * v
+        self.act = act
+
+        init_eps /= dim_seq
+
+        nn.init.uniform_(self.proj.weight, -init_eps, init_eps)
+        nn.init.constant_(self.proj.bias, 1.0)
+
+    def forward(self, x, gate_res=None):
+        device, n = x.device, x.shape[1]
+
+        res, gate = x.chunk(2, dim=-1)
+        gate = self.norm(gate)
+
+        weight, bias = self.proj.weight, self.proj.bias
+        if self.causal:
+            weight, bias = weight[:n, :n], bias[:n]
+            mask = torch.ones(weight.shape[:2], device=device).triu_(1).bool()
+            weight = weight.masked_fill(mask[..., None], 0.0)
+
+        gate = F.conv1d(gate, weight, bias)
+
+        if gate_res is not None:
+            gate = gate + gate_res
+
+        return self.act(gate) * res
 
 
 class gMLPBlock(nn.Module):
@@ -25,13 +52,14 @@ class gMLPBlock(nn.Module):
         d_model: int,
         d_ffn: int,
         seq_len: int,
+        act=nn.GELU()
         # survival_prob: torch.Tensor
     ):
         super(gMLPBlock, self).__init__()
 
         self.norm = nn.LayerNorm(d_model)
         self.proj_1 = nn.Linear(d_model, d_ffn)
-        self.activation = nn.GELU()
+        self.activation = act
         self.spatial_gating_unit = SpatialGatingUnit(d_ffn, seq_len)
         self.proj_2 = nn.Linear(d_ffn // 2, d_model)
         # self.prob = survival_prob
