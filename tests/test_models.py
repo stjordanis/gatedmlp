@@ -45,9 +45,9 @@ def test_torch_pass():
     unit = torchmodel.SpatialGatingUnit(d_ffn=30, seq_len=100)
     block = torchmodel.gMLPBlock(d_model=30, d_ffn=30, seq_len=100)
     out = unit(temp)
-    assert out != None
+    assert out is not None
     out = block(temp)
-    assert out != None
+    assert out is not None
 
 
 def test_tf_pass():
@@ -58,9 +58,9 @@ def test_tf_pass():
     unit = tfmodel.SpatialGatingUnit(seq_len=100)
     block = tfmodel.gMLPBlock(d_model=300, d_ffn=30, seq_len=100)
     out = unit(temp)
-    assert out != None
+    assert out is not None
     out = block(temp)
-    assert out != None
+    assert out is not None
 
 
 def test_flax_pass():
@@ -70,4 +70,4 @@ def test_flax_pass():
     unit = jaxmodel.SpatialGatingUnit(seq_len=100)
     variables = unit.init(random.PRNGKey(0), jnp.ones((100, 100, 30)))
     out = unit.apply(variables, jnp.ones((100, 100, 30)))
-    assert out != None
+    assert out is not None
